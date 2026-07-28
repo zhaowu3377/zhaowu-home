@@ -1,0 +1,12 @@
+# 项目私有记忆与配置（含偏好，不入库）
+.workbuddy/
+
+# 依赖
+node_modules/
+
+# 日志
+*.log
+
+# 本地环境变量
+.env
+.env.local

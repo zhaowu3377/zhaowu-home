@@ -1,0 +1,90 @@
+{
+  "site": {
+    "name": "zhaowu",
+    "avatar": "media/avatar-placeholder.svg",
+    "kicker": "Personal · 个人主页",
+    "tagline": "记录我做过的与正在做的项目、想法与一些不务正业的小实验。",
+    "scrollHint": "向下看",
+    "nav": [
+      { "label": "关于", "url": "index.html#about" },
+      { "label": "项目", "url": "index.html#work" },
+      { "label": "文字", "url": "index.html#writing" },
+      { "label": "联系", "url": "index.html#contact" }
+    ],
+    "contact": [
+      {
+        "label": "hi@zhaowu.com",
+        "url": "mailto:hi@zhaowu.com"
+      },
+      {
+        "label": "GitHub",
+        "url": "#"
+      },
+      {
+        "label": "微信",
+        "url": "#"
+      }
+    ]
+  },
+  "about": [
+    "你好，我是 zhaowu。这里是我个人的小天地，平时折腾一些产品和项目，偶尔写点东西。",
+    "这个站目前还在生长——项目板块先留了位置，点进去就能看到每个项目的详情页。"
+  ],
+  "projects": [
+    {
+      "id": 1,
+      "title": "项目占位一",
+      "desc": "一句话描述这个项目解决了什么问题、用到了什么。",
+      "body": "<p>这里写项目背景：为什么要做、解决的是什么问题。</p><p>写下你在这个项目里具体负责的部分、关键决策和过程。</p><h3>成果</h3><p>放上结果或数据。</p>",
+      "image": "media/placeholder.svg",
+      "solid": false
+    },
+    {
+      "id": 2,
+      "title": "项目占位二",
+      "desc": "一句话描述这个项目解决了什么问题、用到了什么。",
+      "body": "<p>这里写项目背景与你的角色。</p><p>继续写过程与成果。</p>",
+      "image": "media/placeholder.svg",
+      "solid": false
+    },
+    {
+      "id": 3,
+      "title": "项目占位三",
+      "desc": "一句话描述这个项目解决了什么问题、用到了什么。",
+      "body": "<p>这里写项目背景与你的角色。</p><p>继续写过程与成果。</p>",
+      "image": "media/placeholder.svg",
+      "solid": false
+    },
+    {
+      "id": 4,
+      "title": "更多敬请期待",
+      "desc": "正在筹备中的作品会陆续出现在这里。",
+      "body": "<p>这个板块还在筹备中，做出来的作品会陆续出现在这里。</p>",
+      "image": "media/placeholder.svg",
+      "solid": true
+    }
+  ],
+  "posts": [
+    {
+      "id": 1,
+      "date": "2026.07",
+      "title": "为什么我开始写这个站",
+      "image": "media/placeholder.svg",
+      "body": "<p>这里放这篇文章的全文。点击标题会弹出毛玻璃窗口，正文就显示在这里。</p><img src=\"media/placeholder.svg\" alt=\"示例图片\" /><p>图片可以放在任意段落之间，宽度自动撑满弹窗。</p>"
+    },
+    {
+      "id": 2,
+      "date": "2026.06",
+      "title": "极简设计的几点心得",
+      "image": "media/placeholder.svg",
+      "body": "<p>把极简设计的心得写在这里：少即是多，留白也是内容。</p><img src=\"media/placeholder.svg\" alt=\"示例图片\" /><p>每条文字都是独立弹窗。</p>"
+    },
+    {
+      "id": 3,
+      "date": "2026.05",
+      "title": "一个周末小项目复盘",
+      "image": "media/placeholder.svg",
+      "body": "<p>周末小项目的复盘文字放这里：做了什么、踩了什么坑、下次怎么改。</p><p>也可以不放图片，纯文字一样好看。</p>"
+    }
+  ]
+}

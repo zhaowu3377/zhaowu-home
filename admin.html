@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>后台管理 · zhaowu</title>
+<style>
+  :root{ --bg:#fafafa; --line:#e6e4e0; --ink:#18181b; --muted:#707079; --accent:#ff5a1f; --radius:12px; }
+  *{ box-sizing:border-box; }
+  body{ font-family:"Space Grotesk",-apple-system,"PingFang SC",sans-serif; background:var(--bg); color:var(--ink); margin:0; padding:0 0 80px; }
+  .top{ position:sticky; top:0; z-index:10; background:rgba(250,250,250,.9); backdrop-filter:blur(8px); border-bottom:1px solid var(--line); padding:14px 24px; display:flex; gap:14px; align-items:center; flex-wrap:wrap; }
+  .top h1{ font-size:16px; margin:0; }
+  .top .grow{ flex:1; }
+  .top input.token{ padding:8px 12px; border:1px solid var(--line); border-radius:8px; font-size:13px; width:180px; }
+  .btn{ background:var(--accent); color:#fff; border:0; padding:9px 18px; border-radius:8px; font-size:14px; cursor:pointer; font-weight:500; }
+  .btn:hover{ opacity:.9; }
+  .btn.ghost{ background:#fff; color:var(--ink); border:1px solid var(--line); }
+  .btn.sm{ padding:5px 10px; font-size:12px; }
+  .wrap{ max-width:880px; margin:0 auto; padding:0 24px; }
+  .card{ background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:20px; margin:22px 0; }
+  .card > h2{ font-size:18px; margin:0 0 4px; }
+  .hint{ font-size:12px; color:var(--muted); margin:0 0 14px; }
+  label{ display:block; font-size:13px; color:var(--muted); margin:12px 0 5px; }
+  input[type=text], textarea{ width:100%; padding:9px 12px; border:1px solid var(--line); border-radius:8px; font-size:14px; font-family:inherit; }
+  textarea{ min-height:90px; resize:vertical; }
+  .row{ display:flex; gap:10px; align-items:center; margin:8px 0; }
+  .row input{ flex:1; }
+  .item{ border:1px solid var(--line); border-radius:10px; padding:14px; margin:12px 0; background:#fcfcfc; }
+  .item .head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+  .item .head b{ font-size:14px; }
+  .thumb{ width:60px; height:60px; object-fit:cover; border-radius:8px; border:1px solid var(--line); display:block; }
+  .imgline{ display:flex; gap:12px; align-items:center; margin-top:10px; }
+  .status{ font-size:13px; color:var(--accent); margin-left:12px; }
+  .pill{ display:inline-flex; align-items:center; gap:6px; font-size:13px; }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1>🫘 后台管理</h1>
+  <div class="grow"></div>
+  <span class="pill">令牌 <input class="token" id="token" value="zhaowu2026" /></span>
+  <button class="btn" id="save">保存并同步前台</button>
+</div>
+
+<div class="wrap">
+  <!-- 站点信息 -->
+  <div class="card">
+    <h2>站点信息</h2>
+    <p class="hint">首页大标题、标签与简介；头像显示在名字上方。</p>
+    <label>头像（显示在名字上方）</label>
+    <div class="imgline">
+      <img class="thumb" id="avatar-prev" src="media/avatar-placeholder.svg" alt="">
+      <div><input type="file" id="avatar-img" accept="image/*"></div>
+    </div>
+    <label>名字（如 zhaowu）</label>
+    <input type="text" id="site-name" />
+    <label>顶部标签（如 Personal · 个人主页）</label>
+    <input type="text" id="site-kicker" />
+    <label>首页简介</label>
+    <textarea id="site-tagline"></textarea>
+    <label>滚动提示文字（如"向下滚动"、"Scroll Down"）</label>
+    <input type="text" id="site-scrollHint" />
+    <label>联系方式（标签 + 链接）</label>
+    <div id="contact-rows"></div>
+    <button class="btn ghost sm" id="add-contact">+ 添加联系方式</button>
+  </div>
+
+  <!-- 顶部导航 -->
+  <div class="card">
+    <h2>顶部导航栏</h2>
+    <p class="hint">导航项：文字 + 跳转链接（默认锚点到本页各区块）。</p>
+    <div id="nav-rows"></div>
+    <button class="btn ghost sm" id="add-nav">+ 添加导航项</button>
+  </div>
+
+  <!-- 关于 -->
+  <div class="card">
+    <h2>关于</h2>
+    <p class="hint">每段一行，空行分隔不同段落。</p>
+    <textarea id="about-text"></textarea>
+  </div>
+
+  <!-- 项目 -->
+  <div class="card">
+    <h2>项目</h2>
+    <p class="hint">每张卡片 = 一个项目；头图用于项目详情页顶部。正文可写 HTML。</p>
+    <div id="projects-edit"></div>
+    <button class="btn ghost sm" id="add-project">+ 添加项目</button>
+  </div>
+
+  <!-- 文字 -->
+  <div class="card">
+    <h2>文字</h2>
+    <p class="hint">每条 = 一篇文章；缩略图显示在主页列表，正文在弹窗里。正文可写 HTML，上传图片会自动插入。</p>
+    <div id="posts-edit"></div>
+    <button class="btn ghost sm" id="add-post">+ 添加文字</button>
+  </div>
+
+  <div id="msg" class="status"></div>
+</div>
+
+<script>
+let state = null;
+const $ = s => document.querySelector(s);
+const tokenEl = $('#token');
+const msg = $('#msg');
+
+// 读取内容
+fetch('/api/content').then(r => r.json()).then(d => { state = d; renderAll(); });
+
+function renderAll(){
+  $('#site-name').value = (state.site||{}).name || '';
+  $('#site-kicker').value = (state.site||{}).kicker || '';
+  $('#site-tagline').value = (state.site||{}).tagline || '';
+  $('#site-scrollHint').value = (state.site||{}).scrollHint || '向下滚动';
+  $('#avatar-prev').src = (state.site||{}).avatar || 'media/avatar-placeholder.svg';
+  $('#about-text').value = (state.about||[]).join('\n\n');
+  renderContact();
+  renderNav();
+  renderProjects();
+  renderPosts();
+}
+
+// ---- 顶部导航 ----
+function renderNav(){
+  const box = $('#nav-rows'); box.innerHTML = '';
+  (state.site.nav||[]).forEach((n, i) => {
+    const row = document.createElement('div'); row.className = 'row';
+    row.innerHTML = `<input type="text" placeholder="文字" value="${esc(n.label)}" data-f="label">
+      <input type="text" placeholder="链接 url" value="${esc(n.url)}" data-f="url">
+      <button class="btn ghost sm" data-del>×</button>`;
+    row.querySelectorAll('input').forEach(inp => inp.addEventListener('input', e => {
+      state.site.nav[i][e.target.dataset.f] = e.target.value;
+    }));
+    row.querySelector('[data-del]').addEventListener('click', () => { state.site.nav.splice(i,1); renderNav(); });
+    box.appendChild(row);
+  });
+}
+$('#add-nav').addEventListener('click', () => {
+  if (!state.site.nav) state.site.nav = [];
+  state.site.nav.push({label:'新导航', url:'#'});
+  renderNav();
+});
+
+// ---- 联系方式 ----
+function renderContact(){
+  const box = $('#contact-rows'); box.innerHTML = '';
+  (state.site.contact||[]).forEach((c, i) => {
+    const row = document.createElement('div'); row.className = 'row';
+    row.innerHTML = `<input type="text" placeholder="标签" value="${esc(c.label)}" data-f="label">
+      <input type="text" placeholder="链接 url" value="${esc(c.url)}" data-f="url">
+      <button class="btn ghost sm" data-del>×</button>`;
+    row.querySelectorAll('input').forEach(inp => inp.addEventListener('input', e => {
+      state.site.contact[i][e.target.dataset.f] = e.target.value;
+    }));
+    row.querySelector('[data-del]').addEventListener('click', () => { state.site.contact.splice(i,1); renderContact(); });
+    box.appendChild(row);
+  });
+}
+$('#add-contact').addEventListener('click', () => { state.site.contact.push({label:'新链接', url:'#'}); renderContact(); });
+
+// ---- 项目 ----
+function renderProjects(){
+  const box = $('#projects-edit'); box.innerHTML = '';
+  (state.projects||[]).forEach((p, i) => box.appendChild(projectItem(p, i)));
+}
+function projectItem(p, i){
+  const el = document.createElement('div'); el.className = 'item';
+  el.innerHTML = `
+    <div class="head"><b>项目 #${p.id}</b><button class="btn ghost sm" data-del>删除</button></div>
+    <label>标题</label><input type="text" data-f="title" value="${esc(p.title)}">
+    <label>简介（卡片上显示）</label><input type="text" data-f="desc" value="${esc(p.desc)}">
+    <label>正文（详情页，可写 HTML）</label><textarea data-f="body">${esc(p.body)}</textarea>
+    <div class="imgline">
+      <img class="thumb" src="${esc(p.image||'media/placeholder.svg')}" alt="">
+      <div>
+        <div><input type="file" accept="image/*" data-img></div>
+        <label style="margin-top:6px"><input type="checkbox" data-f="solid" ${p.solid?'checked':''}> 设为橙色实色卡</label>
+      </div>
+    </div>`;
+  bindItem(el, p);
+  el.querySelector('[data-del]').addEventListener('click', () => { state.projects.splice(i,1); renderProjects(); });
+  return el;
+}
+$('#add-project').addEventListener('click', () => {
+  const nextId = (state.projects.reduce((m,p)=>Math.max(m,p.id),0)) + 1;
+  state.projects.push({id:nextId, title:'新项目', desc:'一句话描述', body:'<p>正文</p>', image:'media/placeholder.svg', solid:false});
+  renderProjects();
+});
+
+// ---- 文字 ----
+function renderPosts(){
+  const box = $('#posts-edit'); box.innerHTML = '';
+  (state.posts||[]).forEach((p, i) => box.appendChild(postItem(p, i)));
+}
+function postItem(p, i){
+  const el = document.createElement('div'); el.className = 'item';
+  el.innerHTML = `
+    <div class="head"><b>文字 #${p.id}</b><button class="btn ghost sm" data-del>删除</button></div>
+    <div class="row"><input type="text" placeholder="日期 如 2026.07" data-f="date" value="${esc(p.date)}">
+      <input type="text" placeholder="标题" data-f="title" value="${esc(p.title)}"></div>
+    <label>正文（弹窗内，可写 HTML）</label><textarea data-f="body">${esc(p.body)}</textarea>
+    <div class="imgline">
+      <img class="thumb" src="${esc(p.image||'media/placeholder.svg')}" alt="">
+      <div><input type="file" accept="image/*" data-img></div>
+    </div>`;
+  bindItem(el, p);
+  el.querySelector('[data-del]').addEventListener('click', () => { state.posts.splice(i,1); renderPosts(); });
+  return el;
+}
+$('#add-post').addEventListener('click', () => {
+  const nextId = (state.posts.reduce((m,p)=>Math.max(m,p.id),0)) + 1;
+  state.posts.push({id:nextId, date:'2026.07', title:'新文章', image:'media/placeholder.svg', body:'<p>正文</p>'});
+  renderPosts();
+});
+
+// 绑定输入与图片上传
+function bindItem(el, obj){
+  el.querySelectorAll('[data-f]').forEach(inp => {
+    inp.addEventListener('input', e => {
+      const f = e.target.dataset.f;
+      if (f === 'solid') obj.solid = e.target.checked;
+      else obj[f] = e.target.value;
+    });
+  });
+  const fileInput = el.querySelector('[data-img]');
+  const prev = el.querySelector('.thumb');
+  fileInput.addEventListener('change', () => uploadImage(fileInput, prev, obj));
+}
+
+// 上传图片
+function uploadImage(fileInput, prev, obj){
+  const file = fileInput.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const data = reader.result; // dataURL
+    fetch('/api/admin/image', {
+      method:'POST', headers:{'Content-Type':'application/json','x-admin-token':tokenEl.value},
+      body: JSON.stringify({ name: file.name, data })
+    }).then(r => r.json()).then(res => {
+      if (res.url){ obj.image = res.url; if (prev) prev.src = res.url;
+        // 自动在正文末尾插入图片
+        if (obj.body == null) obj.body = '';
+        obj.body = obj.body + `<img src="${res.url}" alt="">`;
+        const ta = fileInput.closest('.item').querySelector('textarea[data-f="body"]');
+        if (ta) ta.value = obj.body;
+        flash('图片已上传：' + res.url);
+      } else flash('上传失败：' + (res.error||''));
+    }).catch(e => flash('上传失败：' + e));
+  };
+  reader.readAsDataURL(file);
+}
+
+function flash(t){ msg.textContent = t; }
+
+// 头像上传
+$('#avatar-img').addEventListener('change', () => {
+  const file = $('#avatar-img').files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    fetch('/api/admin/image',{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':tokenEl.value},body:JSON.stringify({name:file.name,data:reader.result})})
+    .then(r=>r.json()).then(res=>{ if(res.url){ state.site.avatar = res.url; $('#avatar-prev').src = res.url; flash('头像已更新：'+res.url); } else flash('上传失败：'+(res.error||'')); })
+    .catch(e=>flash('上传失败：'+e));
+  };
+  reader.readAsDataURL(file);
+});
+
+function esc(s){ return (s==null?'':String(s)).replace(/"/g,'&quot;'); }
+
+// 保存
+$('#save').addEventListener('click', () => {
+  state.site.name = $('#site-name').value;
+  state.site.kicker = $('#site-kicker').value;
+  state.site.tagline = $('#site-tagline').value;
+  state.site.scrollHint = $('#site-scrollHint').value;
+  state.about = $('#about-text').value.split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean);
+  fetch('/api/admin/content', {
+    method:'POST', headers:{'Content-Type':'application/json','x-admin-token':tokenEl.value},
+    body: JSON.stringify(state)
+  }).then(r => r.json()).then(res => {
+    flash(res.ok ? '✅ 已保存，刷新前台即可看到更新' : '❌ 保存失败：' + (res.error||''));
+  }).catch(e => flash('❌ 保存失败：' + e));
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675">
+  <rect width="1200" height="675" fill="#f4f3f1"/>
+  <circle cx="965" cy="150" r="120" fill="#ff5a1f" opacity="0.12"/>
+  <circle cx="235" cy="545" r="165" fill="#ff5a1f" opacity="0.08"/>
+  <text x="600" y="340" font-family="'Space Grotesk', sans-serif" font-size="34" fill="#9a9a9f" text-anchor="middle">图片占位 · 在此替换为你的图</text>
+  <text x="600" y="384" font-family="'Space Grotesk', sans-serif" font-size="18" fill="#bdbdbd" text-anchor="middle">把 src 改成你的图片路径即可</text>
+</svg>

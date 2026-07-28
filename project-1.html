@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>项目占位一 · zhaowu</title>
+<link rel="stylesheet" href="style.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <header>
+    <div class="wrap">
+      <nav>
+        <a class="brand" href="index.html">zhaowu<span class="dot">.</span></a>
+        <div class="nav-right">
+          <div class="nav-links">
+            <a href="index.html#about">关于</a>
+            <a href="index.html#work">项目</a>
+            <a href="index.html#writing">文字</a>
+            <a href="index.html#contact">联系</a>
+          </div>
+          <button class="theme-toggle" id="themeToggle" aria-label="切换深色模式" title="切换深色模式">☾</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <a class="back" href="index.html">← 返回主页</a>
+
+    <section class="project">
+      <div class="num">01</div>
+      <h1>项目占位一</h1>
+      <p class="lede">一句话描述这个项目解决了什么问题、用到了什么。</p>
+
+      <!-- 下面的 meta / prose 都是占位，直接改文字即可 -->
+      <div class="meta">
+        <div class="meta-item"><div class="label">角色</div><div class="value">产品 / 开发</div></div>
+        <div class="meta-item"><div class="label">年份</div><div class="value">2026</div></div>
+        <div class="meta-item"><div class="label">技术</div><div class="value">待补充</div></div>
+      </div>
+
+      <div class="prose">
+        <p>这里写项目背景：为什么要做、解决的是什么问题。把经历讲清楚，比堆术语更有用。</p>
+        <h3>我做了什么</h3>
+        <p>写下你在这个项目里具体负责的部分、关键决策和过程。可以分段，也可以加小标题。</p>
+        <h3>成果</h3>
+        <p>放上结果或数据：上线后怎样、带来了什么改变、你学到了什么。</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>© <span id="year"></span> zhaowu</span>
+      <span>用克制的方式，做点长久的东西。</span>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    const root = document.documentElement;
+    const toggle = document.getElementById('themeToggle');
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) root.classList.add('dark');
+    function syncIcon(){ toggle.textContent = root.classList.contains('dark') ? '☀' : '☾'; }
+    syncIcon();
+    toggle.addEventListener('click', () => { root.classList.toggle('dark'); localStorage.setItem('theme', root.classList.contains('dark') ? 'dark' : 'light'); syncIcon(); });
+  </script>
+  <script src="particles.js"></script>
+</body>
+</html>
