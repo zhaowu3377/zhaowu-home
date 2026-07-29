@@ -120,6 +120,11 @@ const server = http.createServer(async (req, res) => {
     });
   }
 
+  // 状态：是否启用 GitHub 自动推送（供后台横幅判断）
+  if (req.method === 'GET' && pathname === '/api/status') {
+    return sendJSON(res, 200, { githubEnabled: !!GH_TOKEN, repo: GH_REPO, branch: GH_BRANCH });
+  }
+
   // 保存内容（后台，需令牌）
   if (req.method === 'POST' && pathname === '/api/admin/content') {
     if ((req.headers['x-admin-token'] || '') !== ADMIN_TOKEN) return sendJSON(res, 401, { error: 'unauthorized' });
@@ -127,8 +132,8 @@ const server = http.createServer(async (req, res) => {
       const obj = JSON.parse(await readBody(req));
       const text = JSON.stringify(obj, null, 2);
       fs.writeFileSync(CONTENT_FILE, text);
-      await ghPush('content.json', Buffer.from(text)); // 已配令牌则自动推到 GitHub
-      return sendJSON(res, 200, { ok: true });
+      const githubPushed = await ghPush('content.json', Buffer.from(text));
+      return sendJSON(res, 200, { ok: true, githubPushed });
     } catch (e) { return sendJSON(res, 400, { error: String(e) }); }
   }
 
@@ -143,8 +148,8 @@ const server = http.createServer(async (req, res) => {
       const b64 = String(data).includes(',') ? String(data).split(',')[1] : data;
       const buf = Buffer.from(b64, 'base64');
       fs.writeFileSync(path.join(MEDIA_DIR, safe), buf);
-      await ghPush(`media/${safe}`, buf);
-      return sendJSON(res, 200, { url: 'media/' + safe });
+      const githubPushed = await ghPush(`media/${safe}`, buf);
+      return sendJSON(res, 200, { url: 'media/' + safe, githubPushed });
     } catch (e) { return sendJSON(res, 400, { error: String(e) }); }
   }
 
