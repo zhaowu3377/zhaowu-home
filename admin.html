@@ -32,6 +32,9 @@
   .imgline{ display:flex; gap:12px; align-items:center; margin-top:10px; }
   .status{ font-size:13px; color:var(--accent); margin-left:12px; }
   .pill{ display:inline-flex; align-items:center; gap:6px; font-size:13px; }
+  .banner{ padding:10px 24px; font-size:13px; font-weight:500; line-height:1.5; }
+  .banner.warn{ background:#fff7e6; color:#b45309; border-bottom:1px solid #fde68a; }
+  .banner.ok{ background:#ecfdf5; color:#047857; border-bottom:1px solid #a7f3d0; }
 </style>
 </head>
 <body>
@@ -42,6 +45,8 @@
   <span class="pill">令牌 <input class="token" id="token" value="zhaowu2026" /></span>
   <button class="btn" id="save">保存并同步前台</button>
 </div>
+
+<div id="gh-banner" class="banner" hidden></div>
 
 <div class="wrap">
   <!-- 站点信息 -->
@@ -105,9 +110,24 @@ let state = null;
 const $ = s => document.querySelector(s);
 const tokenEl = $('#token');
 const msg = $('#msg');
+const ghBanner = $('#gh-banner');
 
 // 读取内容
 fetch('/api/content').then(r => r.json()).then(d => { state = d; renderAll(); });
+updateGhBanner();
+
+function updateGhBanner(){
+  fetch('/api/status').then(r => r.json()).then(s => {
+    if (s.githubEnabled) {
+      ghBanner.className = 'banner ok';
+      ghBanner.textContent = '✅ 已连接 GitHub，保存将自动推送到仓库（Pages 约 1–2 分钟后更新）';
+    } else {
+      ghBanner.className = 'banner warn';
+      ghBanner.textContent = '⚠️ 未连接 GitHub：当前保存仅存到本地，不会自动同步到网站。如需自动同步，请在启动 server 前设置 GITHUB_TOKEN 环境变量。';
+    }
+    ghBanner.hidden = false;
+  }).catch(() => { /* 忽略 */ });
+}
 
 function renderAll(){
   $('#site-name').value = (state.site||{}).name || '';
@@ -245,7 +265,7 @@ function uploadImage(fileInput, prev, obj){
         obj.body = obj.body + `<img src="${res.url}" alt="">`;
         const ta = fileInput.closest('.item').querySelector('textarea[data-f="body"]');
         if (ta) ta.value = obj.body;
-        flash('图片已上传：' + res.url);
+        flash('图片已上传：' + res.url + (res.githubPushed ? '（已推送 GitHub）' : '（仅本地）'));
       } else flash('上传失败：' + (res.error||''));
     }).catch(e => flash('上传失败：' + e));
   };
@@ -260,7 +280,7 @@ $('#avatar-img').addEventListener('change', () => {
   const reader = new FileReader();
   reader.onload = () => {
     fetch('/api/admin/image',{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':tokenEl.value},body:JSON.stringify({name:file.name,data:reader.result})})
-    .then(r=>r.json()).then(res=>{ if(res.url){ state.site.avatar = res.url; $('#avatar-prev').src = res.url; flash('头像已更新：'+res.url); } else flash('上传失败：'+(res.error||'')); })
+    .then(r=>r.json()).then(res=>{ if(res.url){ state.site.avatar = res.url; $('#avatar-prev').src = res.url; flash('头像已更新：'+res.url + (res.githubPushed ? '（已推送 GitHub）' : '（仅本地）')); } else flash('上传失败：'+(res.error||'')); })
     .catch(e=>flash('上传失败：'+e));
   };
   reader.readAsDataURL(file);
@@ -279,7 +299,9 @@ $('#save').addEventListener('click', () => {
     method:'POST', headers:{'Content-Type':'application/json','x-admin-token':tokenEl.value},
     body: JSON.stringify(state)
   }).then(r => r.json()).then(res => {
-    flash(res.ok ? '✅ 已保存，刷新前台即可看到更新' : '❌ 保存失败：' + (res.error||''));
+    if (!res.ok) return flash('❌ 保存失败：' + (res.error||''));
+    if (res.githubPushed) flash('✅ 已保存并推送到 GitHub，稍等 1–2 分钟刷新前台即可看到更新');
+    else flash('✅ 已保存到本地（未连接 GitHub，不会同步到网站）');
   }).catch(e => flash('❌ 保存失败：' + e));
 });
 </script>
