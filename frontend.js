@@ -22,7 +22,15 @@
   const yearEl = document.getElementById('year');
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-  function load() { return fetch('/api/content').then(r => r.json()); }
+  // 优先取后端接口；在 GitHub Pages 等无后端环境自动回退到仓库内的静态 content.json
+  function load() {
+    return fetch('/api/content')
+      .then(r => { if (!r.ok) throw new Error('api-unavailable'); return r.json(); })
+      .catch(() => fetch('content.json').then(r => {
+        if (!r.ok) throw new Error('static-unavailable');
+        return r.json();
+      }));
+  }
 
   // ---------- 首页 ----------
   function renderHome(d) {
