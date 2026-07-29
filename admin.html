@@ -35,6 +35,7 @@
   .banner{ padding:10px 24px; font-size:13px; font-weight:500; line-height:1.5; }
   .banner.warn{ background:#fff7e6; color:#b45309; border-bottom:1px solid #fde68a; }
   .banner.ok{ background:#ecfdf5; color:#047857; border-bottom:1px solid #a7f3d0; }
+  .banner.info{ background:#eff6ff; color:#1d4ed8; border-bottom:1px solid #bfdbfe; }
 </style>
 </head>
 <body>
@@ -126,7 +127,11 @@ function updateGhBanner(){
       ghBanner.textContent = '⚠️ 未连接 GitHub：当前保存仅存到本地，不会自动同步到网站。如需自动同步，请在启动 server 前设置 GITHUB_TOKEN 环境变量。';
     }
     ghBanner.hidden = false;
-  }).catch(() => { /* 忽略 */ });
+  }).catch(() => {
+    ghBanner.className = 'banner info';
+    ghBanner.textContent = 'ℹ️ 未检测到后端服务（/api/status 无响应）：当前可能为静态托管，保存功能不可用，请在本地运行 server.js 后再访问。';
+    ghBanner.hidden = false;
+  });
 }
 
 function renderAll(){
