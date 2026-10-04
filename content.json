@@ -2,14 +2,26 @@
   "site": {
     "name": "zhaowu",
     "avatar": "media/avatar-placeholder.svg",
-    "kicker": "Personal · 个人主页",
+    "kicker": "Personal · 个人主页1",
     "tagline": "记录我做过的与正在做的项目、想法与一些不务正业的小实验。",
     "scrollHint": "向下看",
     "nav": [
-      { "label": "关于", "url": "index.html#about" },
-      { "label": "项目", "url": "index.html#work" },
-      { "label": "文字", "url": "index.html#writing" },
-      { "label": "联系", "url": "index.html#contact" }
+      {
+        "label": "关于",
+        "url": "index.html#about"
+      },
+      {
+        "label": "项目",
+        "url": "index.html#work"
+      },
+      {
+        "label": "文字",
+        "url": "index.html#writing"
+      },
+      {
+        "label": "联系",
+        "url": "index.html#contact"
+      }
     ],
     "contact": [
       {
